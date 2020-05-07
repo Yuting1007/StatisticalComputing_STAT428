@@ -1,0 +1,19 @@
+unnamed-chunk-1	f	result
+unnamed-chunk-2	x	y
+unnamed-chunk-3	betahat	l
+unnamed-chunk-4	beta_init	gradient	hess	nextbeta
+unnamed-chunk-5	beta1	l	log_L
+unnamed-chunk-6	beta1_uni	dl
+unnamed-chunk-7	beta1_g	grid	res
+unnamed-chunk-8	beta1_n	Newton
+unnamed-chunk-9	Ex3
+unnamed-chunk-10	Ln_lkhd
+unnamed-chunk-11	lkh	theta
+unnamed-chunk-12	max_est_theta
+unnamed-chunk-13	df	dg	eta	is	mh	N	plot.x	rg	theta	x	.Random.seed
+unnamed-chunk-14	Lden	N	rw.Metropolis	rw1	rw2	rw3	rw4	sigma	x0
+unnamed-chunk-15	
+unnamed-chunk-16	b	b.lim	burn	days	i	is	m	posterior	prob.ratio	prob.vector	ps	rw.b	secs	win	ws	xb	xb.seq	xbs
+unnamed-chunk-17	burn	dg	i	is	k.i	k.mh	k.rw	m	max	min	prob.ratio	prob.vector	r	rg	sd	size	sizes	u	v	x	x.i	x.mh	x.rw	xs	xt	y
+unnamed-chunk-18	b	f	Gelman.Rubin	i	k	psi	r.hat	ral.chain	sigma	x	x.mcmc
+unnamed-chunk-19	

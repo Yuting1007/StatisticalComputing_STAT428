@@ -1,0 +1,309 @@
+---
+title: 'STAT 428: Homework 3: <br> Chapter 3 and Chapters 5 Monte Carlo Methods'
+author: "Sun, Yifan, yifans8 <br> Collaborated with: Du, Yuting, yutingd3 of any collaboraters"
+date: ""
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    theme: readable
+    toc: yes
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
+# Due Week 6, Saturday Feb 29 by 11:59 PM on Compass
+options(scipen = 1, digits = 4, width = 80)
+library(knitr)
+opts_chunk$set(echo=FALSE,
+               cache=TRUE, autodep=TRUE, cache.comments=FALSE,
+               message=FALSE, warning=FALSE)
+```
+
+---------------------------------------
+
+Please refer to the [**detailed homework policy document**] on Course Page for information about homework formatting, submission, and grading. 
+
+---------------------------------------
+
+## Exercise 1 
+**Sampling discrete distributions.**
+
+**(a)** Design an algorithm to simulate from a `Geometric(p)` (where $x$ is the number of failures until the first success) distribution via the inverse transform method. _(Hint: Recall that Geometric random variables are just the number of Bernoulli random variables with the same parameter `p` until you get a success. So just focus on simulating `n` Bernoulli variables and then you can transform to Geometric ones.)_
+```{r, eval=TRUE, echo=TRUE}
+u = numeric()
+k = numeric()
+geo = function(n,p){
+for (i in 1:n) {
+  u[i] = runif(1,0,1)
+  if (u[i] < p)
+    k[i] = 0
+  else
+    k[i] = ceiling(log(1-u[i])/log(1-p))-1  
+}
+  return(k)
+}
+```
+**(b)** Write R code to generate a sample following the Geometric distribution based on your designed algorithm in the previous part. Use $n=1000$ sample size and $p=0.4$. Then, estimate the expected value of this Geometric distribution via Monte Carlo integration to check if your estimates match the theoretically expected value of Geometric distribution or not.
+```{r, eval=TRUE, echo=TRUE}
+mean(geo(1000, 0.4))
+mean(rgeom(1000,0.4))
+```
+
+## Exercise 2
+**Monte Carlo Integration.** Use Monte Carlo integration to estimate
+
+**(a)** $$\int_{0}^{2} \cos(x*e^x) dx$$
+```{r, eval=TRUE, echo=TRUE}
+x = runif(10000,0,2)
+gx = cos(x*exp(x))
+theta = 2 * mean(gx)
+theta
+```
+**(b)** $$\int_{0}^{1}\int_{0}^{1} e^{-(x+y)^2}(x^2+y) dx dy$$
+```{r, eval=TRUE, echo=TRUE}
+x = runif(10000,0,1)
+y = runif(10000,0,1)
+gx = exp(-(x+y)^2)*(x^2 + y)
+theta = mean(gx)
+theta
+```
+**(c)** $$\int_{0}^{4}\int_{0}^{3} e^{-(x+y)^2}(x^2+y) dx dy$$
+```{r, eval=TRUE, echo=TRUE}
+x = runif(10000,0,3)
+y = runif(10000,0,4)
+gx = exp(-(x+y)^2)*(x^2 + y)
+theta = 12*mean(gx)
+theta
+```
+
+## Exercise 3
+**Variance reduction in Monte Carlo Integration: Antithetic sampling.** Let us consider the simple integral $$ \int_0^1 \log(x+1) \; dx. $$ (where $\log(x)=\ln(x)$)  
+    
+**(a)** Use Monte Carlo integration with $k = 1000$ iterations to approximate this integral. Call this approximate value $I_0$.
+```{r, eval=TRUE, echo=TRUE}
+x = runif(1000)
+gx = log(x+1)
+I0 = mean(gx)
+I0
+```
+**(b)** Find the error of this approximation by repeating this simulation $n = 1000$ times and calculating standard error of this estimator. Call this error $E_0$. _(Hint: Rememeber standard error = standard deviation of the estimator from multiple simulations.)_
+```{r, eval=TRUE, echo=TRUE}
+I = numeric()
+E0 = numeric()
+for(i in 1:1000){
+  u = runif(1000)
+  gx = log(u+1)
+  I[i] = mean(gx)
+}
+E0 = sd(I)
+E0
+```
+**(c)** Note that if $U \sim Unif(0,1)$, then $1 - U \sim Unif(0,1)$ also. Obtain a Monte Carlo approximation of the integral using $k_1 = 500$ iterations and uniform distribution _(This step is same as part (a))_. Call this $I_{11}$. Obtain another MC approximation (call this $I_{12}$) using $k_2 = 500$ iterations and the antithetic uniform distribution _(Which means in part (a), now use 1-U instead of U.)_ Find the average of these two approximations and call it $I_1 = (I_{11}+I_{12})/2$. What is $I_1$ an approximation of? Compare it to $I_0$.
+```{r, eval=TRUE, echo=TRUE}
+x = runif(500)
+gx = log(x + 1)
+I11 = mean(gx)
+I11
+x = 1 - runif(500)
+gx = log(x + 1)
+I12 = mean(gx)
+I12
+I1 = 0.5*(I11+I12)
+I1
+```
+**(d)** Repeat step (c) 1000 times and find the standard error of the estimator $I_1$. Compare this error with the error $E_0$ from (b).
+```{r, eval=TRUE, echo=TRUE}
+I1 = numeric()
+E1 = numeric()
+for(i in 1:1000){
+  u = runif(500)
+  gx1 = log(u + 1)
+  gx2 = log(2 - u)
+  I1[i]=0.5*(mean(gx1)+mean(gx2))
+}
+E1 = sd(I1)
+# The E1 is smaller than E0.
+```
+## Exercise 4
+**Variance reduction in Monte Carlo Integration: Importance Sampling.** Note that we can write any integral as
+$$ \int_0^1 f(x) \; dx = \int_0^1 \frac{f(x)}{g(x)} \; g(x) \; dx = E \left[ \frac{f(X)}{g(X)} \right], $$ where the last expectation is taken over the reference distribution $g$. Let $f(x) = \log(x+1)$ (where $\log(x)=\ln(x)$). I propose the following reference distribution, $g(x) = (1 + \alpha) x^\alpha, \; 0 \le x \le 1$ with $\alpha = 1.5$. This is sometimes refererred to as the power-law distribution.
+
+**(a)** Describe an inverse transform algorithm to sample from the proposed distribution $g(x)$.
+```{r, eval=TRUE, echo=TRUE}
+a = 1.5
+u = runif(1)
+x = u^(1/(a+1))
+```
+**(b)** Implmement your algorithm to get 1000 samples from $g(x)$, $(X_1, X_2, \ldots, X_{1000})$.
+```{r, eval=TRUE, echo=TRUE}
+a = 1.5
+u = runif(1000)
+x = u^(1/(a+1))
+```
+**(c)** Compute the quantity $I_2 = \frac{1}{1000} \sum_{i=1}^{1000} \frac{f(X_i)}{g(X_i)}$ for your sample from part (b). What is this quantity $I_2$ as estimate of? Compare it with $I_1$.
+```{r, eval=TRUE, echo=TRUE}
+fx = function(x){
+  f = log(x+1)
+  g = (x>0)*(x<1)
+  f*g
+}
+f_g = fx(x = x)/((1+a)*(x^a))
+I2 = mean(f_g)
+# I2 is the estimate value of theta, the integrate of the function f(x).
+```
+**(d)** Repeat steps (b) and (c) 1000 times and find the standard error of the estimator I2. Compare this error with the error E0 from Exercise 3(b).  
+```{r, eval=TRUE, echo=TRUE}
+a = 1.5
+fx = function(x){
+  f = log(x+1)
+  g = (x>0)*(x<1)
+  f*g
+}
+for(i in 1:1000){
+x = runif(1000)^(1/(a+1))
+f_g = fx(x)/((1+a)*(x^a))
+theta[i] = mean(f_g)
+}
+E2 = sd(theta)
+E2
+# The standard error of I2 is smaller than E0.
+```
+## Exercise 5  
+**Stratified Sampling.** Sometimes, it can be beneficial to divide the interval into pieces (strata).  Consider $$ \int_{-3}^3 x^3(e^x-1) \; dx$$.  
+
+**(a)** Graph the function over the range of interest.  Is the function fairly constant?  Does it vary?  What patterns do you see?  
+```{r, eval=TRUE, echo=TRUE}
+x = seq(-3,3,by = 0.1)
+y = (x^3) * (exp(x)-1)
+plot(x, y, type = "l")
+# The plot shows that samples from this function are not distributed fairly. We have more x between -3 and 2 and less x in (2,3).
+```
+**(b)** Use standard Monte Carlo integration with $k = 10,000$ iterations to approximate this integral. Call this approximate value $S_0$.  
+```{r, eval=TRUE, echo=TRUE}
+set.seed(1)
+x = runif(10000, -3, 3)
+gx = (x^3) * (exp(x)-1)
+s_0 = 6*mean(gx)
+s_0
+```
+**(c)** Split the function into six equal strata, (-3,-2), (-2,-1), ... and (2,3).  Use Monte Carlo integration to approximate the first strata using $k=10,000/6$, and the do the same with the other five strata.  Combine the results, and call this approximate value $S_1$.      
+```{r, eval=TRUE, echo=TRUE}
+s_1 = numeric()
+for(i in 1:6){
+  x = runif(n = round(10000/6), min = i - 4, max = i - 3)
+  gx = (x^3) * (exp(x)-1)
+  s_1[i] = mean(gx)
+}
+s_1 = sum(s_1)
+s_1
+```
+**(d)** Repeat steps (b) and (c) 1000 times and find the standard error of both estimates.  Which estimator is more efficient?  Can you think of better places to split the interval to get a more efficient estimator?  
+```{r, eval=TRUE, echo=TRUE}
+for (i in 1:1000) {
+  x = runif(10000, -3, 3)
+  gx = (x^3) * (exp(x)-1)
+  s_0[i] = 6*mean(gx)
+}
+sd(s_0)
+
+s1 = numeric()
+for (i in 1:1000) {
+  for(j in 1:6){
+  x = runif(n = round(10000/6), min = j - 4, max = j - 3)
+  gx = (x^3) * (exp(x)-1)
+  s1[j] = mean(gx)
+}
+s_1[i] = sum(s1[j])
+}
+sd(s_1)
+# The second method has smaller SE and is more efficient. We can increase the number of intervals in method 2 in order to improve efficiency.
+```
+Do the following problems from the book:  5.2, 5.4, 5.13, 5.14.
+
+## Exercise 6 (5.2)
+Refer to Example 5.3. Compute a Monte Carlo estimate of the standard normal cdf, by generating from the Uniform(0,x) distribution. Compare your estimates with the normal cdf function pnorm. Compute an estimate of the variance of your Monte Carlo estimate of $\Phi(2)$, and a 95\% confidence interval for $\Phi(2)$.
+```{r, eval=TRUE, echo=TRUE}
+x = seq(0.1, 2.5, by = 0.1)
+u = runif(10000)
+cdf = numeric()
+se = numeric()
+for (i in 1:length(x)) {
+  u = runif(10000, 0, x[i])
+  gx = exp(-u^2 / 2)
+  cdf[i] = x[i]*mean(gx)/sqrt(2*pi) + 0.5
+  se[i] = x[i]*sd(gx)/sqrt(2*pi)/sqrt(10000)
+}
+
+cbind(x, cdf,   phi=pnorm(q = x),se)
+#cbind(x, cdf,   phi=pnorm(q = x),se)[20,4]^2 # variance for MC estimate of phi(2).
+cbind(x, cdf, phi=pnorm(q = x),se)[20,2]+cbind(x, cdf, phi=pnorm(q = x),se)[20,4]*c(-1.96,1.96) # 95% CI for MC estimate of phi(2).
+```
+## Exercise 7 (5.4)
+
+Write a function to compute a Monte Carlo estimate of the Beta(3, 3) cdf, and use the function to estimate F (x) for $x = 0.1,0.2,\ldots 0.9$. Compare the estimates with the values returned by the pbeta function in R.
+```{r, eval=TRUE, echo=TRUE}
+B = 1/30
+cdf = numeric()
+x = seq(0.1, 0.9, by = 0.1)
+for (i in 1:length(x)) {
+  u = runif(10000,0,x[i])
+  gx = ((u^2)*(1-u)^2)
+  cdf[i] = x[i]*mean(gx)/B
+}
+cbind(x, cdf, pbeta(q = x, 3, 3))
+```
+## Exercise 8 (5.13)
+
+Find two importance functions f1 and f2 that are supported on $(1,\infty)$ and
+are ‘close’ to
+$$g(x) = \frac{x^2}{\sqrt{2\pi}} e^{-\frac{x^2}{2}} \quad x>1$$
+
+Which of your two importance functions should produce the smaller variance in estimating
+$$\int_1^{\infty}\frac{x^2}{\sqrt{2\pi}} e^{-\frac{x^2}{2}} dx $$
+by importance sampling? Explain.
+```{r, eval=TRUE, echo=TRUE}
+gx = function(x){
+  (x>1) * (x^2) * exp(-(x^2)/2) / sqrt(2*pi)
+}
+for (i in 1:1000) {
+  a = rexp(1)
+  if(a>=1){x[i]=a}
+  else {x[i]=0}
+}
+x = x[x!=0]
+g_f = gx(x)*(1-pexp(1,1)) / exp(-x)
+theta1 = mean(g_f)
+se1 = sd(g_f)
+
+for (i in 1:1000) {
+  a = rgamma(1,2,1)
+  if(a>=1){x[i]=a}
+  else {x[i]=0}
+}
+x = x[x!=0]
+g_f = gx(x)*(1-pgamma(q = 1,2,1)) / (x*exp(-x)) 
+theta2 = mean(g_f)
+se2 = sd(g_f)
+# I choose exponential distribution with lambda = 1 and gamma distribution with alpha = 2 and beta = 1. The exponential distribution has lower variance because it has closer shape as the target distribution.
+se1
+se2
+```
+## Exercise 9 (5.14)
+
+Obtain a Monte Carlo estimate of
+$$\int_1^{\infty}\frac{x^2}{\sqrt{2\pi}} e^{-\frac{x^2}{2}} dx $$
+by importance sampling.
+```{r, eval=TRUE, echo=TRUE}
+gx = function(x){
+  (x>1) * (x^2) * exp(-(x^2)/2) / sqrt(2*pi)
+}
+for (i in 1:1000) {
+  a = rexp(1)
+  if(a>=1){x[i]=a}
+  else {x[i]=0}
+}
+x = x[x!=0]
+g_f = gx(x)*(1-pexp(1,1)) / exp(-x)
+theta = mean(g_f)
+theta
+```

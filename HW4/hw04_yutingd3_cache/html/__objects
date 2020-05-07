@@ -1,0 +1,12 @@
+unnamed-chunk-1	E0	i	I0	u	x	.Random.seed
+unnamed-chunk-2	E1	i	I1	I11	I12	k1	k2	u1	u2
+unnamed-chunk-3	u	x
+unnamed-chunk-4	E2	gf	gfphi	m	u	x
+unnamed-chunk-5	k	K	m	mse	n	trimmed.mse
+unnamed-chunk-6	c	hx	i	observed_x	post.mean	theta
+unnamed-chunk-7	AR	fx	observed_x	x
+unnamed-chunk-8	i	k	K	m	mse_est	mse_se	n	table	tmean	x
+unnamed-chunk-9	alpha	i	m	M	mu	mu0	n	power	pvalues	sigma	x
+unnamed-chunk-10	i	j	m	M	mu	mu1	n	N	power	pvalues	x
+unnamed-chunk-11	alpha	LCL	m	n	qt	UCL	x
+unnamed-chunk-12	alpha	i	m	mu1	mu2	n	power_CF	power_F	sample_num	sigma1	sigma2	table	testF	tests_CF	tests_F	tests5	x

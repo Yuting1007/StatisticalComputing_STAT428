@@ -1,0 +1,17 @@
+unnamed-chunk-1	$	c	log	optimize
+unnamed-chunk-2	c
+unnamed-chunk-3	$	c	exp	list	log	optim	return	sum	x	y
+unnamed-chunk-4	array	c	grad	hessian	l	library	solve
+unnamed-chunk-5	exp	log	plot	return	sapply	seq	sum	x	y
+unnamed-chunk-6	$	c	exp	return	sum	uniroot	x	y
+unnamed-chunk-7	==	l	max	sapply	seq
+unnamed-chunk-8	[<-	<	abs	break	dl	if	numeric	return	while
+unnamed-chunk-9	c
+unnamed-chunk-10	^	Ex3	for	length	log	return
+unnamed-chunk-11	c	for	Ln_lkhd	plot	seq
+unnamed-chunk-12	^	Ex3	length	sum
+unnamed-chunk-13	[<-	^	<=	>	c	dnorm	for	hist	if	lines	max	min	numeric	par	pi	plot	print	return	rnorm	runif	seq	stopifnot
+unnamed-chunk-14	$	[<-	<=	abs	c	exp	for	if	list	numeric	print	return	rnorm	runif
+unnamed-chunk-15	$	plot	rw1	rw2	rw3	rw4
+unnamed-chunk-16	[[	[<-	^	||	<	<=	>	c	factorial	for	hist	if	lapply	length	lines	max	min	numeric	par	paste	plot	prod	rep	return	runif	sample	sapply	seq	split	tabulate
+unnamed-chunk-17	!	&&	[<-	^	<=	abs	as.list	c	dunif	for	hist	if	is.na	is.nan	numeric	par	plot	print	prod	return	runif	sum

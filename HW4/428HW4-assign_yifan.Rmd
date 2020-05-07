@@ -1,0 +1,306 @@
+---
+title: 'STAT 428: Homework 4: <br> Chapter 6 Monte Carlo Methods in Inference'
+author: "Sun, Yifan, yifans8 <br> Collaborated with: WRITE LAST NAME, FIRST NAME, Netid(not UIN) of any collaboraters"
+date: ""
+output:
+  html_document:
+    theme: readable
+    toc: yes
+  pdf_document:
+    toc: yes
+params:
+  solution: TRUE
+  release: FALSE
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
+options(scipen = 1, digits = 4, width = 80)
+library(knitr)
+opts_chunk$set(echo=FALSE,
+               cache=TRUE, autodep=TRUE, cache.comments=FALSE,
+               message=FALSE, warning=FALSE)
+```
+
+---------------------------------------
+
+Please refer to the [**detailed homework policy document**] on Course Page for information about homework formatting, submission, and grading. 
+
+---------------------------------------
+
+## Exercise 1  
+**An Exploration of Standard Error in Monte Carlo Estimation**  
+
+Consider the following integral:  
+   \[
+   {\frac{\ln{(x+1)}}{\pi\sqrt{x(1-x)}}}dx.
+   \]
+
+  a. Estimate the integral using naive Monte Carlo.  What is the standard error of this estimate?  
+```{r}
+theta = numeric()
+for(i in 1:1000){
+  x = runif(10000)
+  gx = log(x+1)/(pi*sqrt(x*(1-x)))
+  theta[i] = mean(gx)
+}
+sd(theta)
+
+integrate(function(x){log(x+1)/(pi*sqrt(x*(1-x)))},0,1)
+
+x = runif(10000)
+gx = log(x+1)/(pi*sqrt(x*(1-x)))
+theta = mean(gx)
+sd(gx)/sqrt(10000)
+
+```
+  b. Let's see if we can improve the standard error.  Implement Monte Carlo with antithetic sampling to estimate this integral.  What is the standard error of this estimate?  
+```{r}
+I = numeric()
+for(i in 1:1000){
+  x = runif(5000)
+  y = 1-runif(5000)
+  g1 = log(x+1)/(pi*sqrt(x*(1-x)))
+  g2 = log(y+1)/(pi*sqrt(y*(1-y)))
+  I[i] = (mean(g1)+mean(g2))/2
+}
+sd(I)
+mean(I)
+
+x = runif(5000)
+y = 1-runif(5000)
+g1 = log(x+1)/(pi*sqrt(x*(1-x)))
+g2 = log(y+1)/(pi*sqrt(y*(1-y)))
+I = (mean(g1)+mean(g2))/2
+(sd(g1)+sd(g2))/sqrt(10000)
+```
+  c. Would stratified sampling seem to help here?  Why or why not?  (Whatever you decide, you do not need to implement it).  
+```{r}
+x = seq(0,1,by = 0.01)
+y = log(x+1)/(pi*sqrt(x*(1-x)))
+plot(x, y, type = "l")
+# The stratified sampling method will hepl reduce vairance because the plot above shows samples from this function are not distributed fairly. So we can use stratified sampling to make more samples from 0.8 to 1.  
+```
+  d. $f(x)=\frac{1}{\pi\sqrt{x(1-x)}}$ for $x\in(0,1)$ is the probability density function for the [Arcsine distribution](https://en.wikipedia.org/wiki/Arcsine_distribution).  Using inverse transformation method, sample 1000 random values from the Arcsine distribution.  
+```{r}
+u = runif(1000)
+x = (sin(u*pi/2)^2)
+```  
+  e. Use importance sampling and the code you wrote in part d to estimate this integral.  What is the standard error?  
+```{r}
+u = runif(10000)
+x = (sin(u*pi/2)^2)
+gx = log(x+1)
+theta = mean(gx)
+sd(gx)/sqrt(10000)
+```  
+  f. Are all methods equally effective?  Which method is the most efficient?  
+Solution: Important sampling is the most efficient method since it has smallest standard error.
+
+  
+
+## Exercise 2  
+**Comparing MSE of estimators using MC.**
+
+Let $f(x|\theta) = \mathrm{t}(\nu,\mu)$, the [non-central t-distribution](https://en.wikipedia.org/wiki/Noncentral_t-distribution), where $\mu$ is a location parameter and $\nu$ is the degrees of freedom.  
+
+Estimate the MSE of the level k trimmed means for random samples of size 20 generated from a a non-central t-distribution with degrees of freedom 3 and mean 4 (with $\nu = 3$ and $\mu=4$). Summarize the estimates of MSE in a table for k = 1, 2, ... , 9.  
+```{r}
+n = 20
+m = 1000
+k = 9
+tmean = matrix(0,m,k)
+mse = numeric()
+se.mse = numeric()
+for(i in 1:k){
+  for(j in 1:m){
+    z = rnorm(n)
+    v = rchisq(n, df = 3)
+    t = (z+4)/sqrt(v/3)
+    x = sort(rt(n = n, df = 3, ncp = 4))
+    tmean[j,i] = sum(x[(i+1):(n-i)])/(n-2*i)
+  }
+  mse[i] = mean((tmean[,i]-4)^2)
+  se.mse[i]=sqrt(mean((tmean[,i]-mean(tmean[,i]))^2))/sqrt(m)
+}
+cbind(seq(1:k),mse,se.mse)
+```
+## Exercise 3  
+**Bayesian Statistics**
+Suppose $X_1,\ldots,X_n$ are $n$ independent and identical distributed random variables from $Exp(\theta)$, where $\theta$ is the unknown parameter. So, $$f(x|\theta) = \theta \; e^{-\theta x}, \quad x \ge 0.$$
+
+We assume the prior distribution on $\theta$ is the Gamma distribution ($Gamma(3,2)$). $$ g(\theta) = 4 \theta^2 e^{-2\theta}, \quad x \ge 0. $$
+
+1. Write down the posterior distribution of $\theta$, $g(\theta|X)$.
+```{r}
+g_theta_x = theta*exp(-theta*x)*4*(theta^2)*exp(-2*theta)
+# The posterior distribution is proportional to the right side.
+```
+2. Suppose $n=6$ and we observe that $x_1=0.4, x_2=1.1, x_3=0.2, x_4=1.6, x_5=1.4, x_6=0.9$. Estimate the posterior mean of $\theta$ based on $1000$ simulated $\theta$ from its prior distribution.
+```{r}
+x = c(0.4,1.1,0.2,1.6,1.4,0.9)
+post.mean = numeric()
+for(i in 1:length(x)){
+theta = rgamma(n = 1000, shape = 3, rate = 2)
+hx[i] = theta*exp(-theta*x[i])
+c = mean(hx)
+post.mean[i] = mean(theta*hx)/c
+}
+cbind(x,post.mean)
+```
+3. Suppose $n=6$ and we observe that $x_1=0.4, x_2=1.1, x_3=0.2, x_4=1.6, x_5=1.4, x_6=0.9$.
+    a. Design an acceptance-rejection sampling algorithm to generate $1000$ (accepted) samples of $\theta$ from the posterior distribution of $\theta$. Write down your algorithm with your instrumental distribution $g(\theta)$. (Hint: for the acceptance-rejection sampling method, the normalizing constant in the posterior distribution can be ignored.)  
+Solution:  
+1. Sampling from Gamma(3,2) for theta and sampling from uniform(0,1) for u;
+2. Calculating fx and gx;
+3. Run the accept-reject algorithm
+
+
+  b. Implement your acceptance-rejection sampling algorithm with R code. Plot the histogram of your generated sample and compare your sample mean with your estimated posterior mean obtained in Ex.3.2.
+```{r}
+fx = function(theta, x){
+  theta*exp(-theta*x)*4*(theta^2)*exp(-2*theta)
+}
+AR = function(x, n){
+  i = 0
+  theta = numeric()
+  M = 0.5
+  while (i < n) {
+    theta0 = rgamma(1,shape = 3, rate = 2)
+    u = runif(1)
+    if(M*u < fx(theta0, x)/dgamma(x, shape = 3, rate = 2)){
+      i = i + 1
+      theta[i] = theta0
+    }
+  }
+  return(theta)
+}
+x = c(0.4,1.1,0.2,1.6,1.4,0.9)
+AR(x = x, n = 6)
+
+```
+## Exercise 4  
+Do 6.1 in the book, except with $n=25$ and $k=1,2,\cdots,10$.  
+```{r}
+n = 25
+m = 1000
+k = 10
+tmean = matrix(0,m,k)
+mse = numeric()
+se.mse = numeric()
+for(i in 1:k){
+  for(j in 1:m){
+    x = sort(rcauchy(n))
+    tmean[j,i] = sum(x[(i+1):(n-i)])/(n-2*i)
+  }
+  mse[i] = mean(tmean[,i]^2)
+  se.mse[i]=sqrt(mean((tmean[,i]-mean(tmean[,i]))^2))/sqrt(m)
+}
+cbind(seq(1:k),mse,se.mse)
+```
+## Exercise 5 
+
+Do exercise 6.2 from the book.  
+```{r}
+n = 20
+m = 1000
+mu0 = 500
+sigma = 100
+mu = c(seq(450, 650, 10))
+M = length(mu)
+power = numeric(M)
+for (i in 1:M) {
+  mu1 = mu[i]
+  pvalues = replicate(m, expr = {
+    x = rnorm(n, mean = mu1, sd = sigma) 
+    ttest = t.test(x, alternative = "two.sided", mu = mu0) 
+    ttest$p.value})
+  power[i] = mean(pvalues <= .025) + mean(pvalues >= 0.975)
+  }
+library(Hmisc)
+plot(mu, power)
+abline(v = mu0, lty = 1) 
+abline(h = .05, lty = 1)
+se = sqrt(power * (1-power) / m)
+errbar(mu, power, yplus = power+se, yminus = power-se, xlab = bquote(theta))
+lines(mu, power, lty=3)
+```
+## Exercise 6 
+
+Do exercise 6.3 from the book.  
+```{r}
+n = c(10,20,30,40,50)
+m = 1000
+mu0 = 500
+sigma = 100
+mu = c(seq(450, 650, 10))
+M = length(mu)
+N = length(n)
+power = matrix(0,M,N)
+for (j in 1:length(n)) {
+  for (i in 1:M) {
+  mu1 = mu[i]
+  pvalues = replicate(m, expr = {
+    x = rnorm(n[j], mean = mu1, sd = sigma) 
+    ttest = t.test(x, alternative = "greater", mu = mu0) 
+    ttest$p.value})
+  power[i,j] = mean(pvalues <= .05)
+  }
+}
+plot(mu, power[,1], type = "l", lty = 2, col = "black", main = "Power curve for different sample sizes", xlab = "mu", ylab = "power")
+lines(mu, power[,2], lty = 4, col = "blue")
+lines(mu, power[,3], lty = 6, col = "red")
+lines(mu, power[,4], lty = 4, col = "yellow")
+lines(mu, power[,5], lty = 8, col = "pink")
+legend("bottomright", c("n = 10", "n = 20", "n = 30", "n = 40", "n = 50"), lty = c(2,4,6,4,8), col = c("black", "blue", "red", "yellow", "pink"))
+```
+## Exercise 7  
+Do exercise 6.5 from the book.  
+```{r}
+n = 20
+m = 1000
+alpha = 0.05
+cl_up = replicate(m, expr = {
+  x = rchisq(n, df = 2)
+  mean(x) + qt(1-alpha/2, df = n-1)*sd(x)/sqrt(n)
+})
+cl_low = replicate(m, expr = {
+  x = rchisq(n, df = 2)
+  mean(x) - qt(1-alpha/2, df = n-1)*sd(x)/sqrt(n)
+})
+CL = 0
+for(i in 1:m){
+  CL = CL + (ci_low[i]<2 & ci_up[i]>2)
+}
+CL/m
+# The converage probability of t-interval is 90%, which is higher than 77.3% in example 6.4.
+```
+## Exercise 8  
+Do exercise 6.8 from the book.  Use 15 as small sample size, 50 as medium sample size, and 250 as large sample size.  
+```{r}
+count5test = function(x, y) {
+  X = x - mean(x)
+  Y = y - mean(y)
+  outx = sum(X > max(Y)) + sum(X < min(Y)) 
+  outy = sum(Y > max(X)) + sum(Y < min(X))
+  return(as.integer(max(c(outx, outy)) > 5))
+}
+sigma1 = 1
+sigma2 = 1.5
+n = c(15,50,250)
+m = 1000
+count5test1 = numeric()
+power = numeric()
+ftest = numeric()
+f_test = numeric()
+for(j in 1:3){
+for(i in 1:m){
+  x = rnorm(n[j], 0, sigma1)
+  y = rnorm(n[j], 0, sigma2) 
+  count5test1[i] = count5test(x, y)
+  ftest[i] = var.test(x,y,alternative = "two.sided")$p.value
+}
+  power[j] = mean(count5test1)
+  f_test[j] = mean(ftest>0.055)
+}
+cbind(n, power, f_test)
+```

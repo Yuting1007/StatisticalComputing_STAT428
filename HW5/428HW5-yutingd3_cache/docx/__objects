@@ -1,0 +1,18 @@
+unnamed-chunk-1	n	x	.Random.seed
+unnamed-chunk-2	m
+unnamed-chunk-3	b	B	se	Tboot	xb
+unnamed-chunk-4	norm_sd	se_theory
+unnamed-chunk-5	lower	upper	zval
+unnamed-chunk-6	jackknife_sd	v	x
+unnamed-chunk-7	Ex3
+unnamed-chunk-8	count	theta.hat	val
+unnamed-chunk-9	b	B	bs	count	se	Tboot	val	xb
+unnamed-chunk-10	b	B	i	sumsq	theta.hat	theta.hat.jack	x	xi
+unnamed-chunk-11	b	B	bs	se	Tboot	xb
+unnamed-chunk-12	cw
+unnamed-chunk-13	x	y
+unnamed-chunk-14	B	i	nu	perm	reps	t0	x	x1	y	y1	z
+unnamed-chunk-15	alpha	b	B	b2	CI	i	i2	law.b	law.b2	n	qs	sd.theta.hats.b	se.b	se.hat	theta.hat	theta.hats.b	ts	ts.ordered
+unnamed-chunk-16	e1	e2	e3	e4	J1	J2	J3	J4	k	logyhat3	logyhat4	n	x	y	yhat1	yhat2	yhat3	yhat4
+unnamed-chunk-17	e1	e2	e3	e4	i	j	J1	J2	J3	J4	logyhat31	logyhat32	logyhat41	logyhat42	n	x	y	yhat11	yhat12	yhat21	yhat22	yhat31	yhat32	yhat41	yhat42
+unnamed-chunk-18	alpha	b	B	i	k	linseed	m	n	p.hat	rhos	soybean	spearman.cor.test	theta.hat	tmp	xs	ys	zs

@@ -1,0 +1,180 @@
+---
+title: 'STAT 428: Project1'
+author: 'Du, Yuting, yutingd3'
+date: ''
+output:
+  html_document:
+    theme: readable
+    toc: yes
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+params:
+  release: no
+  solution: yes
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
+options(scipen = 1, digits = 4, width = 80)
+library(knitr)
+opts_chunk$set(echo=FALSE,
+               cache=TRUE, autodep=TRUE, cache.comments=FALSE,
+               message=FALSE, warning=FALSE)
+```
+
+## Method - Sums and Mixtures
+Generate chisquare random sample. If Z1, · · · , Zν are iid N(0,1) r.v., then 
+$$V = Z_1^2 + Z_2^2 + ....+Z_v^2$$
+has the $χ^2(v)$
+distribution.
+
+ 1. Fill an n × ν matrix with ν r.v. from N(0,1).
+ 2. Compute the row sums of the squared normals.
+ 3. Deliver the vector of row sums.
+```{r, echo=TRUE, eval=TRUE}
+n <- 1000
+nu <- 10
+X <- matrix(rnorm(n * nu), n, nu)^2 #matrix of sq. normals
+# sum the squared normals across each row: method 1
+y <- rowSums(X)
+
+
+hist(y, probability = TRUE)
+```
+(Poisson-Gamma mixture)
+If$(X|\gamma = \lambda)$ follows $Poisson(\lambda)$ 
+and $\gamma$ follows $Gamma(r, \beta)$
+then X has the negative binomial dist. with parameters r and p = 
+$\beta/(1+\beta)$
+
+
+```{r, echo=TRUE, eval=TRUE}
+# generate a Poisson-Gamma mixture
+
+n <- 1000
+r <- 4
+beta <- 3
+lambda <- rgamma(n, r, beta) #lambda is random
+# now supply the sample of lambda's as the Poisson mean
+x <- rpois(n, lambda) #the mixture
+# compare with negative binomial
+mix <- tabulate(x + 1)/n
+negbin <- round(dnbinom(0:max(x), r, beta/(1 + beta)), 3)
+se <- sqrt(negbin * (1 - negbin)/n)
+round(rbind(mix, negbin, se), 3)
+
+```
+
+
+Mixture of several gamma distribution
+
+1. Generating a random sample k1,....,$k_n$ of intergers in vector k, where $P(k) = \theta_k$, k = 1,....5. $k[i]$ indicates which of the five gamma distribution will be sampled to get the ith element of sample
+
+2. Set rate equal to the length n vector $\lambda = \lambda_k$
+
+3. Generate a gamma sample size n, with shape parameter $r$ and rate vector rate (for comparison)
+```{r, echo=TRUE, eval=TRUE}
+n <- 5000
+k <- sample (1:5 , size =n , replace = TRUE , prob =(1:5) /15)
+rate <- 1/k ; x <- rgamma (n , shape =3 , rate = rate )
+
+# plot the density of the mixture with the densities of the components
+plot ( density ( x ) , xlim =c(0 ,40) , ylim =c(0 ,.3) ,
+lwd =3 , xlab ="x", main ="")
+for ( i in 1:5){
+  lines ( density ( rgamma (n , 3 , 1/i )))  
+}
+
+
+```
+
+## Method2 Marsaglia and Tsang’s Method
+[reference](https://www.hongliangjie.com/2012/12/19/how-to-generate-gamma-random-variables/)
+
+The algorithm works as follows for \( \mathbf{X} \sim \mbox{Gamma}(\alpha, 1) \) for \( \alpha \geq 1 \) 
+
+1. Set \( d = \alpha - 1/3 \) and \( c = 1/\sqrt{9d} \).
+
+2. Generate \( Z \sim \mbox{N}(0,1) \) and \( U \sim \mbox{U}(0,1)\) independently. 
+
+3. If \( Z > -1/c \) and \( \log U < \frac{1}{2} Z^{2} + d - d V + d \times ln V \), where \( V = (1+cZ)^{3}\), return \( \mathbf{X} = d \times V\); otherwise, go back to Step 2. 
+
+Two notes: 
+1. This method can be easily extended to the cases where \( 1 > \alpha > 0 \). We just generate \( \mathbf{X} \sim \mbox{Gamma}(\alpha + 1, \beta)\), then \( \mathbf{X}^{\prime} = \mathbf{X} \times U^{1/\alpha}\) where \(U \sim (0,1)\). Thus, \( \mathbf{X}^{\prime} \sim \mbox{Gamma}(\alpha, \beta)\). See details in Page 9 of [2]. 
+2. For \( \beta \neq 1 \), we firstly generate \( \mathbf{X} \sim \mbox{Gamma}(\alpha, 1)\), then \( \mathbf{X}/\beta \sim \mbox{Gamma}(\alpha, \beta)\). 
+
+```{r, echo=TRUE, eval=TRUE}
+randga = function(a, b){
+  if(a>1){
+    d = a -1/3
+    c = 1/sqrt(9*d)
+    flag = TRUE
+    while(flag){
+      z = rnorm(1000)
+      if (z > -1/c){
+        v = (1+c*x)^3
+        u = runif(1000)
+        flag = log(u) > (0.5*z^2+d-d*v+d*log(v))
+      }
+    }
+    x = d*v/b
+  } else {
+    x = randga(a+1, b)
+    x = x* runif(1000)^(1/a)
+  }
+  return (x)
+}
+
+hist(randga(0.5, 1))
+
+
+```
+
+## Method3 Ahrens-Dieter Table-Free Normal General
+[reference](https://www.doc.ic.ac.uk/~wl/papers/07/csur07dt.pdf)
+
+The Ahrens-Dieter Table-Free method is an exact Gaussian generator that transforms a pair of independent exponential and Cauchy
+random numbers into two independent Gaussian random numbers [Ahrens and Dieter
+1988]. This is similar to the idea behind the Box-Muller method, except that instead
+of applying a complex transform to easily generated uniform random numbers, it applies a simpler transform to two distributions that are more complex to generate. In
+principle, the exponential and Cauchy distributions could be generated directly, using
+− ln U and tan(π(U − 1/2)) respectively, which would make this a transform method.
+
+This algorithm will return a pair of independent Guassian random numbers.
+```{r, echo=TRUE, eval=TRUE}
+
+s = runif(1000)
+if(s < 0.5){
+  s = 1
+} else {
+  s = -1
+}
+x = rexp(1000)
+y = rcauchy(1000)
+
+z = sqrt((2*x)/(1+y^2))
+
+hist(s*z, main = "Histogram of a random variable from normal distribution")
+hist(y*z, main = "Histogram of a random variable from normal distribution")
+```
+
+## Peer Review
+Team members:Yue Wang(yue18), Jiangong Li(jli153), Yifan Sun(yifans8), Mengyuan Zhang(mz37)
+
+Jli153: If possible, you can write some equations to help others to understand the methods.In method 3, the use of U ( ==s in the code?) should be further expanded or just ignore it at all. 
+
+Mz37: Is it better to write an abstract part at the beginning since you have so many topics to introduce?
+
+Yifan (yifans8): I am so impressed that you used three methods and put at least one example in each method in your report. I am more familiar with the first method than the other two, so maybe you could explain the algorithm of the second and third methods more detailed.
+
+Yue18: Very good! You must put a lot of effort into the project since there are three methods in your report.
+
+## feedback to review
+I have added the implementation about s in the third method. Thanks for suggestion!
+
+Yes, I have added the abstract link at the front. Thanks!
+
+Sure. I have added some algorithm explaination for method 2. Thanks!
+
+Thanks!

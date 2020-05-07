@@ -1,0 +1,19 @@
+unnamed-chunk-1	geo	k	u	.Random.seed
+unnamed-chunk-2	u1	x1
+unnamed-chunk-3	x	x2	y
+unnamed-chunk-4	x	x3	y
+unnamed-chunk-5	I0	u
+unnamed-chunk-6	E0	i	u	x
+unnamed-chunk-7	I1	I11	I12	k1	k2	u1	u2
+unnamed-chunk-8	E1	i	I1	I11	I12	k1	k2	u1	u2
+unnamed-chunk-9	alpha	g	u
+unnamed-chunk-10	alpha	g	gfphi	I2	m	u	x
+unnamed-chunk-11	alpha	E2	estimates	fg	gfphi	i	m	x
+unnamed-chunk-12	f
+unnamed-chunk-13	s0	u
+unnamed-chunk-14	g	j	k	m	S1
+unnamed-chunk-15	estimates	g	i	j	k	m	n	S1
+unnamed-chunk-16	cdf	gx	i	se	u	x
+unnamed-chunk-17	beta	cdf	f	i	true_cdf	x
+unnamed-chunk-18	gf	gfphi	m	se	theta.hat	u	x
+unnamed-chunk-19	f1	gf	gfphi	iter	n	thetheta	x

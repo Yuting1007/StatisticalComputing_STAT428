@@ -1,0 +1,12 @@
+unnamed-chunk-1	[<-	for	log	mean	numeric	pi	runif	sd	sqrt
+unnamed-chunk-2	[<-	for	log	mean	numeric	pi	runif	sd	sqrt	u
+unnamed-chunk-3	^	hist	pi	runif	sin
+unnamed-chunk-4	^	<	>	log	pi	runif	sd	sin	sqrt
+unnamed-chunk-5	[<-	^	c	for	matrix	mean	numeric	return	round	rt	sort	sqrt
+unnamed-chunk-6	[<-	cbind	exp	for	length	mean	numeric	rgamma
+unnamed-chunk-7	[<-	^	<	c	dgamma	exp	if	numeric	return	rgamma	runif	while
+unnamed-chunk-8	::	[<-	^	c	cbind	colnames<-	for	matrix	mean	numeric	rcauchy	round	seq	sort	sqrt	sum
+unnamed-chunk-9	$	[<-	<=	abline	c	for	length	library	mean	numeric	plot	replicate	rnorm	seq	t.test
+unnamed-chunk-10	$	[<-	<=	abline	c	for	legend	length	lines	matrix	mean	plot	replicate	rnorm	seq	t.test
+unnamed-chunk-11	<	>	mean	rchisq	replicate	return	sd	sqrt
+unnamed-chunk-12	$	[<-	<	>	as.integer	c	for	max	mean	min	numeric	rbind	replicate	return	rnorm	sum	var.test

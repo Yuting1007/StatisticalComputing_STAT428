@@ -1,0 +1,18 @@
+unnamed-chunk-1	rnorm
+unnamed-chunk-2	mean	x
+unnamed-chunk-3	[<-	for	mean	n	numeric	sample	sd	x
+unnamed-chunk-4	n	sqrt
+unnamed-chunk-5	m	qnorm	se
+unnamed-chunk-6	[<-	^	c	for	length	mean	numeric	return	rnorm	sd	sqrt
+unnamed-chunk-7	c
+unnamed-chunk-8	<	Ex3	for	if	length
+unnamed-chunk-9	[<-	<	bias	Ex3	for	if	length	library	numeric	sample	sd
+unnamed-chunk-10	[<-	^	<	Ex3	for	length	library	mean	n	numeric	sample	sqrt	sum
+unnamed-chunk-11	[<-	bias	Ex3	for	length	library	median	numeric	sample	sd
+unnamed-chunk-12	$	&	==	c	ChickWeight	droplevels
+unnamed-chunk-13	==	cw	t.test
+unnamed-chunk-14	$	[<-	==	>=	abs	c	cw	for	length	mean	numeric	sample	t.test
+unnamed-chunk-15	$	[<-	c	cor	for	hist	law	library	nrow	numeric	quantile	sample	sd	sort
+unnamed-chunk-16	$	[<-	^	~	attach	c	chemical	exp	for	ironslag	length	library	lm	log	magnetic	mean	numeric
+unnamed-chunk-17	!=	$	[<-	^	~	attach	c	chemical	exp	for	if	ironslag	length	library	lm	log	magnetic	mean	numeric	sqrt
+unnamed-chunk-18	$	[<-	==	>	abs	c	chickwts	cor	cor.test	for	hist	length	mean	min	numeric	sample	sort

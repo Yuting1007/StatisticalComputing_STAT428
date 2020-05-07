@@ -1,0 +1,295 @@
+---
+title: 'STAT 428: Homework 2: <br> Random Number Generation and Sampling'
+author: "Sun, Yifan, yifans8 <br> Collaborated with: Du, Yuting, yutingd3 of any collaboraters"
+date: "Due Week 5, Saturday Feb 22 by 11:59 PM on Compass"
+output:
+  html_document:
+    theme: readable
+    toc: yes
+  pdf_document:
+    toc: yes
+params:
+  solution: TRUE
+  release: TRUE
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
+options(scipen = 1, digits = 4, width = 80)
+library(knitr)
+opts_chunk$set(echo=FALSE,
+               cache=TRUE, autodep=TRUE, cache.comments=FALSE,
+               message=FALSE, warning=FALSE)
+```
+
+---------------------------------------
+
+Please refer to the [**detailed homework policy document**](https://compass2g.illinois.edu/bbcswebdav/pid-3451553-dt-content-rid-39428440_1/courses/stat_428_120191_169827/1_Info/Syllabus/homework_policy.html) on Course Page for information about homework formatting, submission, and grading. 
+
+---------------------------------------
+
+## Exercise 1
+**(a)** For each of the following commands, either explain why they should be errors, or explain the non-erroneous result. 
+
+```{r,echo=TRUE,eval=FALSE,error=FALSE}
+vector1 <- c("8", "12", "7", "32")
+min(vector1)
+sort(vector1)
+sum(vector1)
+```
+Solution: vector 1 is a character vector storing four characters and the first element of the character decides the size of it. So "12" should be the smallest because the first element of it is "1" and "8" is the largest one. Sort function follows the same logic. But Sum function cannot be applied on character vector, which result in an error.
+
+**(b)** For the next series of commands, either explain their results, or why they should produce errors. 
+
+```{r,echo=TRUE,eval=FALSE,error=FALSE}
+vector2 <- c("5",7,12)
+vector2[2] + vector2[3]
+```
+Solution: The output type is determined from the highest type of components in the vector and the highest type here is character. So two character elements cannot be added together.
+
+```{r,echo=TRUE,eval=FALSE,error=FALSE}
+dataframe3 <- data.frame(z1="5",z2=5,z3=12)
+dataframe3[1,2] + dataframe3[1,3]
+```
+Solution: dataframe3 contains one character "5" and two numeric components 5 and 12. Adding two numeric components together is 5+12=17.
+
+```{r,echo=TRUE,eval=FALSE,error=FALSE}
+list4 <- list(z1="6", z2=42, z3="49", z4=126)
+list4[[2]]+list4[[4]]
+list4[2]+list4[4]
+```
+Solution: List4 is a list containing two character and two numeric elements. [[i]] means the i-th element of the i-th component in the list so that adding the second and fourth in the list4 should be 42+126=168 but [i] means the i-th component of the list so we cannot add z2 and z4 together.
+
+
+## Exercise 2
+**Working with functions and operators.** 
+
+**(a)** The colon operator will create a sequence of integers in order. It is a special case of the function `seq()`. Using the help command `?seq` to learn about the function, design an expression that will give you the sequence of numbers from 1 to 20000 in increments of 582. Design another that will give you a sequence between 1 and 20000 that is exactly 52 numbers in length. 
+```{r,echo=TRUE,eval=FALSE}
+seq(from = 1, to = 20000, by = 582)
+seq(from = 1, to = 20000, length.out = 52)
+```
+
+**(b)** The function `rep()` repeats a vector some number of times. Explain the difference between `rep(1:5, times=6)` and `rep(1:5, each=6)`. 
+```{r,echo=TRUE,eval=TRUE}
+rep(1:5, times=6)
+rep(1:5,each=6)
+```
+Solution: The first one repeats the sequence 1 to 5 six times and the second one repeats 6 times for the each number 1, 2, 3, 4, 5.
+
+
+## Exercise 3
+**Writing R functions.** Write an `R` function that accepts an $n \times n$ matrix $A$ as an argument and returns the trace of A, $trace(A) = \sum_{i=1}^n a_{ii}$. Include code that verifies that the function's argument is indeed a square matrix. Also include comments that describe the function's purpose, argument and output.
+The following code generates a list of 25 matrices of different dimensions. Apply your trace function to each matrix in this list. 
+
+```{r,eval=TRUE, echo=TRUE}
+matrix.list <- lapply(1:25, FUN=function(x) {matrix(1:x^2, nrow=x, ncol=x)})
+#The given list of matrices
+tr = function(x){
+  if(ncol(x)==nrow(x)){
+    n = nrow(x)
+    z = 0
+    for(i in 1:n){
+      z = z + x[i,i]
+    }
+    return(z)
+  }
+  else{
+    print("This is not a square matrix")
+    }
+}
+trace = numeric()
+for (i in 1:25) {
+  trace[i] = tr(matrix.list[[i]])
+}
+trace
+```
+
+
+## Exercise 4
+
+**Simulating Beta(3, 4) Random Variables: Which method is better?** 
+
+In this exercise, you will simulate Beta(3,4) random variables with target density
+\[
+f(x) \propto x^2 \; (1-x)^{3}.
+\]
+using the Accept/Reject Algorithm with two different instrumental densities.
+
+- **[Method I]** Use uniform RV's with instrumental density
+   \[
+   g_{1}(x) = 1,\quad 0 < x < 1.
+   \]
+   
+    - you may use $M \approx 0.0346$.
+    - to simulate from $g_{1}$ use the command `x <- runif(1)`.
+
+- **[Method II]** Use the average of two uniform RV's with instrumental density
+   \[
+   g_{2}(x) = 2 - |4x - 2|,\quad 0 < x <1.
+   \]
+   
+    - you may use $M \approx 0.0264$.
+    - the `R` function for absolute value is `abs`.
+    - to simulate from $g_{2}$ use the command `x <- mean(runif(2))`.
+
+
+- **[Question]**  Which method is better? Answer this by responding to the following parts.
+
+
+**(a)** Write a program that simulates 10,000 Beta(3,4) random variables using both methods. 
+```{r,eval=TRUE, echo=TRUE}
+Y1 = runif(10000)
+for (i in 1:10000) {
+  Y1[i] = Y1[i]*(runif(1)*0.0346<Y1[i]^2 * (1-Y1[i])^3)
+}
+Y1 = Y1[Y1!=0]
+
+Y2 = runif(10000)
+x = numeric()
+for (i in 1:10000) {
+  x[i] = mean(runif(2))
+  Y2[i] = x[i]*(runif(1)*0.0264<((x[i]^2 * (1-x[i])^3)/(2-abs(4*x[i]-2))))
+}
+Y2 = Y2[Y2!=0]
+```
+
+**(b)** Compare the acceptance rates and decide which one is the better algorithm.
+```{r,eval=TRUE, echo=TRUE}
+length(Y1)/10000
+length(Y2)/10000
+# The second candidate distribution has higher acceptance rate
+(1/0.0346)/60
+(1/0.0264)/60
+```
+
+  **(c)** Is it correct to use theoretical acceptance rate $\frac{1}{M}$? Why or why not? 
+Solution: It is not correct because the beta distribution we want to generate is a function related to random variable x but without the constant term. So we need to divided 1/M by the constant term when we calculate acceptance rates.
+
+**(d)** Graph histograms of your results. 
+```{r,eval=TRUE, echo=TRUE}
+hist(Y1, xlab = "Samples xi generated by method 1", main = "Histogram of Sample by method 1")
+hist(Y2, xlab = "Samples xi generated by method 2", main = "Histogram of Sample by method 2")
+```
+
+**(e)** Summarizes your findings. 
+Solution: The first method using uniform dsitribution as candidate is simple with fair acceptance rate but the second method using the candidate distribution with more closer shape as the target distribution than the uniform distribution has higher acceptance rate.
+
+
+## Exercise 5  
+
+**Simulating a mixture distribution.** 
+
+Consider a density function of the form
+
+$$
+f(x)=\sum_{k=1}^{K} \; \pi_{k} \; f_{k}(x)
+$$
+where $\pi_{k} > 0$ for each $k$ and $\sum_{k=1}^{K} \pi_{k}=1$. Also assume
+that each $f_{k}$ is a probability density function for $k=1,2,...,K$.
+
+Then it's not hard to see that $f(x)$ is a probability density function. Furthermore, a random variable $X$ with pdf $f(x)$ is said to arise from a mixture
+of $K$ distributions. The constants $\pi_{k} > 0$ are called mixing probabilities or mixing weights. 
+
+To draw observations from this mixture distribution, we first choose a distribution, say $i$th distribution $f_i(x)$ to sample from based on the mixing probabilities and then generate from that  $i$-th density like you normally would. The resulting variates would be a mixture of the $K$ distributions.
+
+Now, do problem 3.12.
+```{r,eval=TRUE, echo=TRUE}
+r = 4
+b = 2
+u = runif(1000)
+y = b*(1/((1-u)^(1/r))-1)
+```
+
+
+## Exercise 6 
+
+**$\chi^2$ distribution** There are many ways to generate a $\chi^2(\nu)$ distribution.  Consider the following methods.  For each method, plot a historgram of the resulting variables: do they all seem equally effective?   
+
+**(a)** Simulate 10000 pairs of random variables $(Z_1, Z_2)$, both from $\mathcal{N}(0,1)$ using the transformation method 4 under "3.4: Transformation methods" in the book.  Use these pairs to generate 10000 $\chi^2(2)$ random variables.  
+```{r,eval=TRUE, echo=TRUE}
+u = runif(10000)
+v = runif(10000)
+x1 = sqrt(-2*log(u))*cos(2*pi*v)
+x2 = sqrt(-2*log(v))*sin(2*pi*u)
+r_squared = x1 ^ 2 + x2 ^2
+mean(r_squared)
+mean(rchisq(10000,df=2))
+```
+
+ **(b)** How does the exponential distribution relate to a $\chi^2(2)$ distribution? (Do a little research!)  Generate 10000 random variables from a useful exponential distribution using CDF inversion for this case.  Use them to calculate 10000 random variables from a $\chi^2(2)$ distribution.
+```{r,eval=TRUE, echo=TRUE}
+x = -2*log(runif(10000)) # The exponential distribution with lambda = 1/2 has same distribution of chi-squared distribution with df = 2
+mean(x)
+```
+
+ **(c)** Generate 10000 random variables from a gamma distribution such that the resulting variables will be $\chi^2(2)$.  (You can use an r function to generate the gamma variables.)  
+```{r,eval=TRUE, echo=TRUE}
+x = rgamma(n = 10000, shape = 1, rate = 1/2) # Gamma distribution with shape = 1 and rate = 1/2 has same distribution of chi-squared with df = 2
+mean(x)
+```
+
+
+**For Exerise 7-10, do the following problems from the book 3.2, 3.3, 3.5, 3.9.**
+
+## Exerise 7 (3.2)
+```{r,eval=TRUE, echo=TRUE}
+u = runif(1000)
+sgn = numeric()
+for (i in 1:1000) {
+  if(u[i] >= 0.5) sgn[i]=1 else sgn[i]=-1
+}
+x = -sgn*log(1-2*abs(u-0.5))
+mean(x)
+```
+
+
+## Exerise 8 (3.3)
+```{r,eval=TRUE, echo=TRUE}
+u = runif(1000)
+x = 2/((1-u)^(1/2))
+hist(x)
+library("actuar")
+hist(rpareto(n = 1000, shape = 2, scale = 2))
+```
+
+
+## Exerise 9 (3.5)
+```{r,eval=TRUE, echo=TRUE}
+set.seed(1)
+x = c(0,1,2,3,4)
+p = c(0.1,0.2,0.2,0.2,0.3)
+cdf = c(0,cumsum(p))
+u = runif(1000)
+X = (x[findInterval(u,cdf)])
+table(X)
+Empirical_Prob = table(X)/1000
+data.frame(Empirical_Prob,p)
+# The empirical probability is similar to the theoretical probability with the sample size 1000.
+```
+
+
+## Exercise 10 (3.9)
+```{r,eval=TRUE, echo=TRUE}
+u1 = numeric()
+u2 = numeric()
+u3 = numeric()
+x = numeric()
+myfunction = function(n){
+  for (i in 1:n) {
+u1[i] = runif(1,-1,1)
+u2[i] = runif(1,-1,1)
+u3[i] = runif(1,-1,1)
+if(abs(u3[i])>abs(u2[i]) & abs(u3[i])>abs(u1[i])) {
+  x[i] = u2[i]
+} else {
+  x[i] = u3[i]
+}
+  }
+  return(x)
+}
+myfunction(1)
+hist(myfunction(100000),prob=TRUE)
+```
+
+
+

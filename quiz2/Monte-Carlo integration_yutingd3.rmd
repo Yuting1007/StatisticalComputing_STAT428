@@ -1,0 +1,67 @@
+---
+title: "Quiz2"
+author: "Yuting"
+date: "2020/4/24"
+output:
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+  html_document:
+    theme: readable
+    toc: yes
+params:
+  release: no
+  solution: yes
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
+options(scipen = 1, digits = 4, width = 80)
+library(knitr)
+opts_chunk$set(echo=FALSE,
+               cache=TRUE, autodep=TRUE, cache.comments=FALSE,
+               message=FALSE, warning=FALSE)
+
+grd = FALSE
+```
+
+## Topic: Monte-Carlo integration
+
+### Problem description:
+Write a function use the Monte-Carlo integration to get the integration on [a, b] for arbitray function. 
+
+$I(f)=\int_{a}^{b}(f(x))$, arbitrary f.
+Note: (a,b) is an arbitrary interval, finite or infinite
+Assume finite.
+
+### Solution:
+Use Monte-Carlo integration approach to estimate the integration, standard error and 95% CI.
+```{r, echo=TRUE, eval=TRUE}
+#Function to be integrated over [a,b]
+f <- function(x){x} 
+
+Integral <- function(n,a,b,h=f){
+u <- runif(n,a,b) 
+Y <- (h(u))/(1/(b-a))
+Int <- mean(Y)
+
+u <- runif(n,a,b)
+YY <- (h(u)/(1/(b-a)))^2
+SE <- sqrt((mean(YY)-Int^2)/n)
+CI <- c(Int-1.96*SE,Int+1.96*SE)
+list("Int"=Int,"SE"=SE, "CI"=CI)}
+
+```
+
+### Evaluation:
+
+Apply the function on both uniform distribution and exponential distribution.
+```{r, echo=TRUE, eval=TRUE}
+Integral(1000,0,1,f)
+
+f1 <- function(x){exp(-x)}
+Integral(1000,0,10,f1)
+```
+
+### Reference
+[Monte Carlo Integration](https://cran.r-project.org/web/packages/SI/vignettes/my-vignette.html)

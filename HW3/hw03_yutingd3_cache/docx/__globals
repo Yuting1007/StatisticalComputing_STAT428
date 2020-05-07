@@ -1,0 +1,19 @@
+unnamed-chunk-1	[<-	<	ceiling	for	if	log	mean	numeric	return	rgeom	runif
+unnamed-chunk-2	cos	exp	mean	runif
+unnamed-chunk-3	^	exp	mean	runif
+unnamed-chunk-4	^	exp	mean	runif
+unnamed-chunk-5	log	mean	runif	set.seed
+unnamed-chunk-6	[<-	for	log	mean	numeric	runif	sd	set.seed	sqrt
+unnamed-chunk-7	log	mean	runif	set.seed
+unnamed-chunk-8	[<-	for	log	mean	numeric	runif	sd
+unnamed-chunk-9	^	hist	runif	set.seed
+unnamed-chunk-10	^	log	mean	runif
+unnamed-chunk-11	[<-	^	<	>	for	g	log	mean	numeric	runif	sd
+unnamed-chunk-12	^	exp	plot
+unnamed-chunk-13	^	exp	mean	runif
+unnamed-chunk-14	[<-	^	exp	for	mean	numeric	runif	sum
+unnamed-chunk-15	[<-	^	apply	exp	for	matrix	mean	numeric	runif	sum	var
+unnamed-chunk-16	[<-	^	c	cbind	exp	for	length	mean	numeric	pi	pnorm	runif	sd	seq	sqrt
+unnamed-chunk-17	$	[<-	^	<=	>=	abs	data.frame	for	if	integrate	mean	numeric	pbeta	return	runif	seq
+unnamed-chunk-18	[<-	^	>	exp	mean	numeric	pi	rexp	runif	sd	sqrt
+unnamed-chunk-19	[<-	^	<	>	exp	if	mean	numeric	pi	return	rexp	sqrt	while

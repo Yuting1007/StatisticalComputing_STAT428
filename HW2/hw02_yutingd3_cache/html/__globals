@@ -1,0 +1,21 @@
+unnamed-chunk-1	c	min	sort	sum
+unnamed-chunk-2	c
+unnamed-chunk-3	data.frame
+unnamed-chunk-4	[[	list
+unnamed-chunk-5	seq
+unnamed-chunk-6	rep
+unnamed-chunk-7	[[	^	==	dim	for	if	lapply	matrix	message	return
+method 1	$	[<-	^	<	<=	if	list	rep	runif	while
+method1_plot	$	hist	method1
+method2	$	[<-	^	<	<=	abs	if	list	mean	rep	runif	while
+method2_plot	$	hist	method2
+unnamed-chunk-8	$	hist	method1
+unnamed-chunk-9	$	hist	method2
+unnamed-chunk-10	^	hist	runif	set.seed
+unnamed-chunk-11	^	cos	hist	log	mean	pi	rchisq	runif	sin	sqrt
+unnamed-chunk-12	hist	log	mean	runif	set.seed
+unnamed-chunk-13	hist	mean	rgamma	set.seed
+unnamed-chunk-14	[<-	>	abs	c	for	hist	if	log	mean	numeric	rexp	runif	set.seed	T
+unnamed-chunk-15	c	hist	library	rpareto	runif	sqrt	T
+unnamed-chunk-16	c	data.frame	set.seed	table
+unnamed-chunk-17	&	>=	abs	F	hist	ifelse	runif	seq

@@ -1,0 +1,5 @@
+unnamed-chunk-1	^	hist	matrix	rnorm	rowSums
+unnamed-chunk-2	dnbinom	max	rbind	rgamma	round	rpois	sqrt	tabulate
+unnamed-chunk-3	c	density	for	lines	plot	rgamma	sample
+unnamed-chunk-4	^	>	hist	if	log	return	rnorm	runif	sqrt	while
+unnamed-chunk-5	^	<	hist	if	rcauchy	rexp	runif	sqrt
